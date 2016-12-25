@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<body>
+<style>
+    table, td {
+        border: 1px solid black;
+    }
+    td {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+</style>
+    
+<h1> Resources </h1>
+    
+<table>
+    <tr>
+        <td><p id="food">Food: 0</p></td>
+        <td><button type="button" class= 'button' onclick=handleButton(0,0)> Gather Food </button></td>
+    </tr>
+    <tr>
+        <td><p id="wood">Wood: 0</p></td>
+        <td><button type="button" class= 'button' onclick=handleButton(0,1)> Gather Sticks </button></td>
+        <td>0</td>
+    </tr>
+    <tr>
+        <td><p id="stone">Stone: 0</p></td>
+        <td><button type="button" class= 'button' onclick=handleButton(0,2)> Gather Stones </button></td>
+    </tr>
+</table>
+
+<h1> Citizens </h1>    
+    
+<table>
+    <tr>
+        <td>
+            Food: 0
+        </td>   
+        <td>
+            <button type="button" class= 'button' onclick=allotCitizens("food",1)>+</button>
+            <button type="button" class= 'button' onclick=allotCitizens("food",-1)>-</button>
+        </td>
+        <td>
+            0/s
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Wood: 0
+        </td>
+        <td>
+            <button type="button" class= 'button' onclick=allotCitizens("wood",1)>+</button>
+            <button type="button" class= 'button' onclick=allotCitizens("wood",-1)>-</button>
+        </td>
+        <td>
+            0/s
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Stone: 0
+        </td>
+        <td>
+            <button type="button" class= 'button' onclick=allotCitizens("stone",1)>+</button>
+            <button type="button" class= 'button' onclick=allotCitizens("stone",-1)>-</button>
+        </td>
+        <td>
+            0/s
+        </td>
+    </tr>
+</table>
+
+<p id="citizenidle">Idle: 0 </p>
+<p id="citizentotal">Total: 0 </p>
+    
+<h1> Buildings </h1>
+<table>
+    <tr>
+        <td> <p id="hut">Hut: 0</p></td>
+        <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
+    </tr>
+</table>
+    
+
+<script>
+var resourceLabels = ["food","wood","stone"];
+var resources = {food:0,wood:0,stone:0};
+var structureLabels = ["hut"];
+var structures = [0];
+var structureCost = [{wood:4,scaling:1}];
+var citizens = [0,0];
+function handleButton(group, id) {
+    if (group == 0)
+        resourceButton(id);
+    else if (group == 1)
+        buildingButton(id);
+}
+
+function allotCitizens(item,sign) {
+    resources[item] += sign;
+    updateLabels();
+}
+    
+function buildingButton(id) {
+    var sufficient = true;
+    
+    for(var name in structureCost[id]) {
+        var value = structureCost[id][name];
+        if (name != "scaling" && structureCost[id][name] > resources[name])
+            sufficient = false; 
+    }
+    
+    if (sufficient) {
+        var string = document.getElementById(structureLabels[id]).innerHTML;
+        string = string.split(" ");
+        structures[id] += 1;
+        document.getElementById(structureLabels[id]).innerHTML = string[0] + " " + (structures[id]);
+        
+        for(var name in structureCost[id]) {
+            resources[name] -= 4; 
+        }
+        
+        structureBuilt(id);
+        updateLabels();
+    }
+}
+    
+function structureBuilt(id){
+    if (id == 0) {
+        let string = document.getElementById("citizenidle").innerHTML;
+        string = string.split(" ");
+        citizens[0] += 1;
+        document.getElementById("citizenidle").innerHTML = string[0] + " " + citizens[0]; 
+        string = document.getElementById("citizentotal").innerHTML;
+        string = string.split(" ");
+        citizens[1] += 1;
+        document.getElementById("citizentotal").innerHTML = string[0] + " " + citizens[1]; 
+    }
+}
+
+function resourceButton(id) {
+    var string = document.getElementById(resourceLabels[id]).innerHTML;
+    string = string.split(" ");
+    resources[resourceLabels[id]] += 1;
+    document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);    
+}
+    
+function updateLabels() {
+    for(var id in resources) {
+        let string = document.getElementById(id).innerHTML;
+        string = string.split(" ");
+        document.getElementById(id).innerHTML = string[0] + " " + (resources[id]); 
+    }
+}
+
+</script>
+    
+</body>
+</html>
