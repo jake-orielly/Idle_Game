@@ -46,7 +46,7 @@
         table += "<tr><td><div id=citizens" + resourceLabels[i] + ">" + resourceLabels[i] + ": " + citizenData[resourceLabels[i]].alloted + "</div></td>";
         let button1 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",1)>+</button>";
         let button2 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",-1)>-</button>";
-        table += "<td>" + button1 + button2 + "</td><td>" + citizenData[resourceLabels[i]].income + "/s</td>"
+        table += "<td>" + button1 + button2 + "</td><td id=income" + resourceLabels[i] + ">" + citizenData[resourceLabels[i]].income + "/s</td>"
         table += "</tr>";
     }
     
@@ -69,6 +69,19 @@
 
 <script>
 
+setInterval(function(){refresh();},1000);
+
+    
+function refresh() {
+    var id = 1;
+    var string = document.getElementById(resourceLabels[id]).innerHTML;
+    string = string.split(" ");
+    resources[resourceLabels[id]] += citizenData[resourceLabels[id]].income;
+    document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);   
+    
+    updateLabels();
+}
+    
 function handleButton(group, id) {
     if (group == 0)
         resourceButton(id);
@@ -86,7 +99,9 @@ function allotCitizens(item,sign) {
         document.getElementById("citizens" + resourceLabels[item]).innerHTML = alloted[0] + " " + citizenData[resourceLabels[item]].alloted;
         let idle = document.getElementById("citizenIdle").innerHTML;
         idle = idle.split(" ");
-        document.getElementById("citizenIdle").innerHTML = idle[0] + " " + citizens[0]; 
+        document.getElementById("citizenIdle").innerHTML = idle[0] + " " + citizens[0];
+        citizenData[resourceLabels[item]].income += sign;
+        document.getElementById("income" + resourceLabels[item]).innerHTML = citizenData[resourceLabels[item]].income + "/s";
     }
 }
     
