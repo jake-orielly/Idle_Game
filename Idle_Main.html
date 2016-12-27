@@ -9,6 +9,22 @@
         padding-left: 12px;
         padding-right: 12px;
     }
+    
+    .floatingLeft{
+        float: left;
+        margin-left: 30px;
+    }
+    .floatingRight{
+        float: right;
+        margin-right: 30px;
+    }
+    .clearfix{
+        clear:both
+    }
+    
+    .verticalDivider{
+        margin-top: 150px;
+    }
 </style>
 
 <script>
@@ -21,10 +37,13 @@
     var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
 </script>
     
-<h1> Resources </h1>
+<h1 class='floatingLeft'> Resources </h1>
+<h1 class='floatingRight'> Citizens </h1>
 
+<div class = 'clearfix'></div>
+    
 <script>
-    var table = "<table>";
+    var table = "<table class='floatingLeft'>";
     
     for (var i = 0; i < resourceLabels.length; i++) {
         table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
@@ -36,11 +55,10 @@
     
     document.write(table);
 </script>
-
-<h1> Citizens </h1>    
+    
     
 <script>
-    var table = "<table id=\"citizens\">";
+    var table = "<table id='citizens' class='floatingRight'>";
     
     for (var i = 0; i < resourceLabels.length; i++) {
         table += "<tr><td><div id=citizens" + resourceLabels[i] + ">" + resourceLabels[i] + ": " + citizenData[resourceLabels[i]].alloted + "</div></td>";
@@ -50,16 +68,16 @@
         table += "</tr>";
     }
     
+    table += "<tr><td><div id='citizenIdle'>Idle: 0 </div></td>";
+    table += "<td><div id='citizenTotal'>Total: 0 </div></td></tr>";
     table += "</table>";
     
     document.write(table);
 </script>
 
-<p id="citizenIdle">Idle: 0 </p>
-<p id="citizenTotal">Total: 0 </p>
     
-<h1> Buildings </h1>
-<table>
+<h1 class = 'verticalDivider'> Buildings </h1>
+<table class = 'floatingLeft'>
     <tr>
         <td> <p id="hut">Hut: 0</p></td>
         <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
@@ -73,11 +91,12 @@ setInterval(function(){refresh();},1000);
 
     
 function refresh() {
-    var id = 1;
-    var string = document.getElementById(resourceLabels[id]).innerHTML;
-    string = string.split(" ");
-    resources[resourceLabels[id]] += citizenData[resourceLabels[id]].income;
-    document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);   
+    for (var id = 0; id < resourceLabels.length; id++) {
+        var string = document.getElementById(resourceLabels[id]).innerHTML;
+        string = string.split(" ");
+        resources[resourceLabels[id]] += citizenData[resourceLabels[id]].income;
+        document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);      
+    } 
     
     updateLabels();
 }
