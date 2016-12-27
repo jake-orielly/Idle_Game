@@ -9,72 +9,75 @@
         padding-left: 12px;
         padding-right: 12px;
     }
+    
+    .floatingLeft{
+        float: left;
+        margin-left: 30px;
+    }
+    .floatingRight{
+        float: right;
+        margin-right: 30px;
+    }
+    .clearfix{
+        clear:both
+    }
+    
+    .verticalDivider{
+        margin-top: 150px;
+    }
 </style>
-    
-<h1> Resources </h1>
-    
-<table>
-    <tr>
-        <td><p id="food">Food: 0</p></td>
-        <td><button type="button" class= 'button' onclick=handleButton(0,0)> Gather Food </button></td>
-    </tr>
-    <tr>
-        <td><p id="wood">Wood: 0</p></td>
-        <td><button type="button" class= 'button' onclick=handleButton(0,1)> Gather Sticks </button></td>
-        <td>0</td>
-    </tr>
-    <tr>
-        <td><p id="stone">Stone: 0</p></td>
-        <td><button type="button" class= 'button' onclick=handleButton(0,2)> Gather Stones </button></td>
-    </tr>
-</table>
 
-<h1> Citizens </h1>    
+<script>
+    var resourceLabels = ["food","wood","stone"];
+    var resources = {food:0,wood:0,stone:0};
+    var structureLabels = ["hut"];
+    var structures = [0];
+    var structureCost = [{wood:4,scaling:1}];
+    var citizens = [0,0];
+    var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
+</script>
     
-<table>
-    <tr>
-        <td>
-            Food: 0
-        </td>   
-        <td>
-            <button type="button" class= 'button' onclick=allotCitizens("food",1)>+</button>
-            <button type="button" class= 'button' onclick=allotCitizens("food",-1)>-</button>
-        </td>
-        <td>
-            0/s
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Wood: 0
-        </td>
-        <td>
-            <button type="button" class= 'button' onclick=allotCitizens("wood",1)>+</button>
-            <button type="button" class= 'button' onclick=allotCitizens("wood",-1)>-</button>
-        </td>
-        <td>
-            0/s
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Stone: 0
-        </td>
-        <td>
-            <button type="button" class= 'button' onclick=allotCitizens("stone",1)>+</button>
-            <button type="button" class= 'button' onclick=allotCitizens("stone",-1)>-</button>
-        </td>
-        <td>
-            0/s
-        </td>
-    </tr>
-</table>
+<h1 class='floatingLeft'> Resources </h1>
+<h1 class='floatingRight'> Citizens </h1>
 
-<p id="citizenidle">Idle: 0 </p>
-<p id="citizentotal">Total: 0 </p>
+<div class = 'clearfix'></div>
     
-<h1> Buildings </h1>
-<table>
+<script>
+    var table = "<table class='floatingLeft'>";
+    
+    for (var i = 0; i < resourceLabels.length; i++) {
+        table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
+        var button = "<button type=\"button\" class= 'button' onclick=handleButton(0," + i + ")> Gather " + resourceLabels[i] + " </button>"
+        table += "<td>" + button + "</td> </tr>";
+    }
+    
+    table += "</table>";
+    
+    document.write(table);
+</script>
+    
+    
+<script>
+    var table = "<table id='citizens' class='floatingRight'>";
+    
+    for (var i = 0; i < resourceLabels.length; i++) {
+        table += "<tr><td><div id=citizens" + resourceLabels[i] + ">" + resourceLabels[i] + ": " + citizenData[resourceLabels[i]].alloted + "</div></td>";
+        let button1 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",1)>+</button>";
+        let button2 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",-1)>-</button>";
+        table += "<td>" + button1 + button2 + "</td><td id=income" + resourceLabels[i] + ">" + citizenData[resourceLabels[i]].income + "/s</td>"
+        table += "</tr>";
+    }
+    
+    table += "<tr><td><div id='citizenIdle'>Idle: 0 </div></td>";
+    table += "<td><div id='citizenTotal'>Total: 0 </div></td></tr>";
+    table += "</table>";
+    
+    document.write(table);
+</script>
+
+    
+<h1 class = 'verticalDivider'> Buildings </h1>
+<table class = 'floatingLeft'>
     <tr>
         <td> <p id="hut">Hut: 0</p></td>
         <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
@@ -83,12 +86,21 @@
     
 
 <script>
-var resourceLabels = ["food","wood","stone"];
-var resources = {food:0,wood:0,stone:0};
-var structureLabels = ["hut"];
-var structures = [0];
-var structureCost = [{wood:4,scaling:1}];
-var citizens = [0,0];
+
+setInterval(function(){refresh();},1000);
+
+    
+function refresh() {
+    for (var id = 0; id < resourceLabels.length; id++) {
+        var string = document.getElementById(resourceLabels[id]).innerHTML;
+        string = string.split(" ");
+        resources[resourceLabels[id]] += citizenData[resourceLabels[id]].income;
+        document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);      
+    } 
+    
+    updateLabels();
+}
+    
 function handleButton(group, id) {
     if (group == 0)
         resourceButton(id);
@@ -97,8 +109,19 @@ function handleButton(group, id) {
 }
 
 function allotCitizens(item,sign) {
-    resources[item] += sign;
-    updateLabels();
+    if ((sign == 1 && citizens[0] > 0) || 
+        (sign == -1 && citizenData[resourceLabels[item]].alloted > 0)) {
+        citizenData[resourceLabels[item]].alloted += sign;
+        citizens[0] -= sign;
+        let alloted = document.getElementById("citizens" + resourceLabels[item]).innerHTML;
+        alloted = alloted.split(" ");
+        document.getElementById("citizens" + resourceLabels[item]).innerHTML = alloted[0] + " " + citizenData[resourceLabels[item]].alloted;
+        let idle = document.getElementById("citizenIdle").innerHTML;
+        idle = idle.split(" ");
+        document.getElementById("citizenIdle").innerHTML = idle[0] + " " + citizens[0];
+        citizenData[resourceLabels[item]].income += sign;
+        document.getElementById("income" + resourceLabels[item]).innerHTML = citizenData[resourceLabels[item]].income + "/s";
+    }
 }
     
 function buildingButton(id) {
@@ -127,14 +150,14 @@ function buildingButton(id) {
     
 function structureBuilt(id){
     if (id == 0) {
-        let string = document.getElementById("citizenidle").innerHTML;
+        let string = document.getElementById("citizenIdle").innerHTML;
         string = string.split(" ");
         citizens[0] += 1;
-        document.getElementById("citizenidle").innerHTML = string[0] + " " + citizens[0]; 
-        string = document.getElementById("citizentotal").innerHTML;
+        document.getElementById("citizenIdle").innerHTML = string[0] + " " + citizens[0]; 
+        string = document.getElementById("citizenTotal").innerHTML;
         string = string.split(" ");
         citizens[1] += 1;
-        document.getElementById("citizentotal").innerHTML = string[0] + " " + citizens[1]; 
+        document.getElementById("citizenTotal").innerHTML = string[0] + " " + citizens[1]; 
     }
 }
 
