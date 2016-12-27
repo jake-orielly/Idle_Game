@@ -17,16 +17,17 @@
     var structureCost = [{wood:4,scaling:1}];
     var citizens = [0,0];
     var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
+    var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet"}};
 </script>    
     
 <table>    
     <tr>
-        <td><h1 class='floatingLeft'> Resources </h1></td>
-        <td><h1 class='floatingRight'> Citizens </h1></td>
+        <td><h1> Resources </h1></td>
+        <td><h1> Citizens </h1></td>
     </tr>
     <tr>
         <td><script>
-            var table = "<table class='floatingLeft'>";
+            var table = "<table>";
 
             for (var i = 0; i < resourceLabels.length; i++) {
                 table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
@@ -39,7 +40,7 @@
             document.write(table);
         </script></td>
         <td><script>
-            var table = "<table id='citizens' class='floatingRight'>";
+            var table = "<table id='citizens'>";
 
             for (var i = 0; i < resourceLabels.length; i++) {
                 table += "<tr><td><div id=citizens" + resourceLabels[i] + ">" + resourceLabels[i] + ": " + citizenData[resourceLabels[i]].alloted + "</div></td>";
@@ -57,13 +58,30 @@
         </script></td>
     </tr>
     <tr>
-        <td><h1 class = 'verticalDivider'> Buildings </h1></td>
-        </tr>
+        <td><h1> Buildings </h1></td>
+        <td><h1> Upgrades </h1></td>
+    </tr>
     <tr>
-        <td><table class = 'floatingLeft'>
+        <td><table>
             <tr>
-                <td> <p id="hut">Hut: 0</p></td>
-                <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
+                <td> <div id="hut">Hut: 0</div></td>
+                <td><table>
+                    <tr>
+                        <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
+                    </tr>    
+                </table></td>
+                <td><script>
+                    var table = "<table>";
+
+                    for (var name in upgrades) {
+                        var button = "<button type=\"button\" class= 'button' id = " + name + "onclick=stoneHatchet()> Prototype " + upgrades[name].text + " </button>"
+                        table += "<td>" + button + "</td> </tr>";
+                    }
+
+                    table += "</table>";
+
+                    document.write(table);
+                </script></td>
             </tr>
         </table></td>
     </tr>
@@ -93,6 +111,10 @@ function handleButton(group, id) {
         buildingButton(id);
 }
 
+function stoneHatchet(){
+    alert("fuck!!!")
+}    
+    
 function allotCitizens(item,sign) {
     if ((sign == 1 && citizens[0] > 0) || 
         (sign == -1 && citizenData[resourceLabels[item]].alloted > 0)) {
