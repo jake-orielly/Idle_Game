@@ -36,13 +36,13 @@
         background-color: #ddd;
     }
 
-    /* Create an active/current tablink class */
+    /* Create an active/current tabLink class */
     ul.tab li a:focus, .active {
         background-color: #ccc;
     }
 
     /* Style the tab content */
-    .tabcontent {
+    .tabContent {
         display: none;
         padding: 6px 12px;
         border: 1px solid #ccc;
@@ -62,11 +62,11 @@
 </script>    
 
 <ul class="tab">
-  <li><a href="javascript:void(0)" class="tablinks" onclick="openTab(event, 'Resources')">Resources</a></li>
-  <li><a href="javascript:void(0)" class="tablinks" onclick="openTab(event, 'Upgrades')">Upgrades</a></li>
+  <li><a href="javascript:void(0)" class="tabLinks active" onclick="openTab(event, 'Resources')">Resources</a></li>
+  <li><a href="javascript:void(0)" class="tabLinks" onclick="openTab(event, 'Upgrades')">Upgrades</a></li>
 </ul>
 
-<div id="Resources" class="tabcontent">
+<div id="Resources" class="tabContent">
     <table>    
         <tr>
             <td><h1> Resources </h1></td>
@@ -123,7 +123,7 @@
     </table>
 </div>
 
-<div id="Upgrades" class="tabcontent">
+<div id="Upgrades" class="tabContent">
     <td><h1> Upgrades </h1></td>
     <td><script>
         var table = "<table>";
@@ -140,23 +140,8 @@
 </div>
 
 <script>
-function openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
-}
-</script>    
 
-<script>
-
+startTab();
 setInterval(function(){refresh();},1000);
 
     
@@ -170,6 +155,27 @@ function refresh() {
     
     updateLabels();
 }
+ 
+function startTab() {
+    var tabLinks = document.getElementsByClassName("tabLinks");
+    document.getElementById("Resources").style.display = "block";
+    tabLinks += " active";
+}    
+    
+function openTab(evt, tabName) {
+    var i, tabContent, tabLinks;
+    tabContent = document.getElementsByClassName("tabContent");
+    for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+    }
+    tabLinks = document.getElementsByClassName("tabLinks");
+    for (i = 0; i < tabLinks.length; i++) {
+        tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+    }
+    
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}    
     
 function handleButton(group, id) {
     if (group == 0)
