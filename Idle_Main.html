@@ -7,6 +7,47 @@
         padding-left: 12px;
         padding-right: 12px;
     }
+    
+    ul.tab {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+
+    /* Float the list items side by side */
+    ul.tab li {float: left;}
+
+    /* Style the links inside the list items */
+    ul.tab li a {
+        display: inline-block;
+        color: black;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        transition: 0.3s;
+        font-size: 17px;
+    }
+
+    /* Change background color of links on hover */
+    ul.tab li a:hover {
+        background-color: #ddd;
+    }
+
+    /* Create an active/current tablink class */
+    ul.tab li a:focus, .active {
+        background-color: #ccc;
+    }
+
+    /* Style the tab content */
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
 </style>
 
 <script>
@@ -19,74 +60,100 @@
     var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
     var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet"}};
 </script>    
-    
-<table>    
-    <tr>
-        <td><h1> Resources </h1></td>
-        <td><h1> Citizens </h1></td>
-    </tr>
-    <tr>
-        <td><script>
-            var table = "<table>";
 
-            for (var i = 0; i < resourceLabels.length; i++) {
-                table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
-                var button = "<button type=\"button\" class= 'button' onclick=handleButton(0," + i + ")> Gather " + resourceLabels[i] + " </button>"
-                table += "<td>" + button + "</td> </tr>";
-            }
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTab(event, 'Resources')">Resources</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openTab(event, 'Upgrades')">Upgrades</a></li>
+</ul>
 
-            table += "</table>";
+<div id="Resources" class="tabcontent">
+    <table>    
+        <tr>
+            <td><h1> Resources </h1></td>
+            <td><h1> Citizens </h1></td>
+        </tr>
+        <tr>
+            <td><script>
+                var table = "<table>";
 
-            document.write(table);
-        </script></td>
-        <td><script>
-            var table = "<table id='citizens'>";
+                for (var i = 0; i < resourceLabels.length; i++) {
+                    table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
+                    var button = "<button type=\"button\" class= 'button' onclick=handleButton(0," + i + ")> Gather " + resourceLabels[i] + " </button>"
+                    table += "<td>" + button + "</td> </tr>";
+                }
 
-            for (var i = 0; i < resourceLabels.length; i++) {
-                table += "<tr><td><div id=citizens" + resourceLabels[i] + ">" + resourceLabels[i] + ": " + citizenData[resourceLabels[i]].alloted + "</div></td>";
-                let button1 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",1)>+</button>";
-                let button2 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",-1)>-</button>";
-                table += "<td>" + button1 + button2 + "</td><td id=income" + resourceLabels[i] + ">" + citizenData[resourceLabels[i]].income + "/s</td>"
-                table += "</tr>";
-            }
+                table += "</table>";
 
-            table += "<tr><td><div id='citizenIdle'>Idle: 0 </div></td>";
-            table += "<td><div id='citizenTotal'>Total: 0 </div></td></tr>";
-            table += "</table>";
+                document.write(table);
+            </script></td>
+            <td><script>
+                var table = "<table id='citizens'>";
 
-            document.write(table);
-        </script></td>
-    </tr>
-    <tr>
-        <td><h1> Buildings </h1></td>
-        <td><h1> Upgrades </h1></td>
-    </tr>
-    <tr>
-        <td><table>
-            <tr>
-                <td> <div id="hut">Hut: 0</div></td>
-                <td><table>
-                    <tr>
-                        <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
-                    </tr>    
-                </table></td>
-                <td><script>
-                    var table = "<table>";
+                for (var i = 0; i < resourceLabels.length; i++) {
+                    table += "<tr><td><div id=citizens" + resourceLabels[i] + ">" + resourceLabels[i] + ": " + citizenData[resourceLabels[i]].alloted + "</div></td>";
+                    let button1 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",1)>+</button>";
+                    let button2 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",-1)>-</button>";
+                    table += "<td>" + button1 + button2 + "</td><td id=income" + resourceLabels[i] + ">" + citizenData[resourceLabels[i]].income + "/s</td>"
+                    table += "</tr>";
+                }
 
-                    for (var name in upgrades) {
-                        var button = "<button type=\"button\" class= 'button' id = " + name + "onclick=stoneHatchet()> Prototype " + upgrades[name].text + " </button>"
-                        table += "<td>" + button + "</td> </tr>";
-                    }
+                table += "<tr><td><div id='citizenIdle'>Idle: 0 </div></td>";
+                table += "<td><div id='citizenTotal'>Total: 0 </div></td></tr>";
+                table += "</table>";
 
-                    table += "</table>";
+                document.write(table);
+            </script></td>
+        </tr>
+        <tr>
+            <td><h1> Buildings </h1></td>
+        </tr>
+        <tr>
+            <td><table>
+                <tr>
+                    <td> <div id="hut">Hut: 0</div></td>
+                    <td><table>
+                        <tr>
+                            <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
+                        </tr>    
+                    </table></td>
+                </tr>
+            </table></td>
+        </tr>
 
-                    document.write(table);
-                </script></td>
-            </tr>
-        </table></td>
-    </tr>
-    
-</table>
+    </table>
+</div>
+
+<div id="Upgrades" class="tabcontent">
+    <td><h1> Upgrades </h1></td>
+    <td><script>
+        var table = "<table>";
+
+        for (var name in upgrades) {
+            var button = "<button type=\"button\" class= 'button' id = " + name + "onclick=stoneHatchet()> Prototype " + upgrades[name].text + " </button>"
+            table += "<td>" + button + "</td> </tr>";
+        }
+
+        table += "</table>";
+
+        document.write(table);
+    </script></td>
+</div>
+
+<script>
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>    
 
 <script>
 
