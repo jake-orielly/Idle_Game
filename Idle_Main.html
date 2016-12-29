@@ -48,6 +48,33 @@
         border: 1px solid #ccc;
         border-top: none;
     }
+    
+    /* Popup container - can be anything you want */
+    .popup {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    /* The actual popup */
+    .popup .popuptext {
+        visibility: hidden;
+        width: 160px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px 0;
+        position: absolute;
+        z-index: 1;
+        top: 125%;
+        left: 50%;
+        margin-left: -80px;
+    }
+    /* Toggle this class - hide and show the popup */
+    .popup .show {
+        visibility: visible;
+    }
 </style>
 
 <script>
@@ -58,7 +85,7 @@
     var structureCost = [{wood:4,scaling:1}];
     var citizens = [0,0];
     var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
-    var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet"}};
+    var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet",popupText:"Doubles Wood Yields"},stonePickaxe:{text:"Stone Pickaxe",popupText:"Doubles Stone Yields"}};
 </script>    
 
 <ul class="tab">
@@ -78,7 +105,7 @@
 
                 for (var i = 0; i < resourceLabels.length; i++) {
                     table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
-                    var button = "<button type=\"button\" class= 'button' onclick=handleButton(0," + i + ")> Gather " + resourceLabels[i] + " </button>"
+                    var button = "<button type='button' class= 'button' onclick=handleButton(0," + i + ")> Gather " + resourceLabels[i] + " </button>"
                     table += "<td>" + button + "</td> </tr>";
                 }
 
@@ -109,14 +136,8 @@
         </tr>
         <tr>
             <td><table>
-                <tr>
                     <td> <div id="hut">Hut: 0</div></td>
-                    <td><table>
-                        <tr>
-                            <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
-                        </tr>    
-                    </table></td>
-                </tr>
+                    <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
             </table></td>
         </tr>
 
@@ -124,19 +145,26 @@
 </div>
 
 <div id="Upgrades" class="tabContent">
-    <td><h1> Upgrades </h1></td>
-    <td><script>
-        var table = "<table>";
+    <table>
+        <tr>
+            <td><h1> Upgrades </h1></td>
+        </tr>
+        <tr>
+            <td><script>
+                var table = "<table>";
 
-        for (var name in upgrades) {
-            var button = "<button type=\"button\" class= 'button' id = " + name + "onclick=stoneHatchet()> Prototype " + upgrades[name].text + " </button>"
-            table += "<td>" + button + "</td> </tr>";
-        }
+                for (var name in upgrades) {
+                    var popup = "<span class='popuptext' id='" + name + "Popup'>" + upgrades[name].popupText + "</span>"
+                    var button = "<button type='button' class= 'button popup' onclick=stoneHatchet() onmouseover=triggerPopup('" + name + "') onmouseout=triggerPopup('" + name + "')> Prototype " + upgrades[name].text + popup + " </button>";
+                    table += "<td>" + button + "</td> </tr>";
+                }
 
-        table += "</table>";
+                table += "</table>";
 
-        document.write(table);
-    </script></td>
+                document.write(table);
+            </script></td>
+        </tr>
+    </table>
 </div>
 
 <script>
@@ -144,6 +172,10 @@
 startTab();
 setInterval(function(){refresh();},1000);
 
+function triggerPopup(item) {
+    var popup = document.getElementById(item + 'Popup');
+    popup.classList.toggle('show');
+}    
     
 function refresh() {
     for (var id = 0; id < resourceLabels.length; id++) {
@@ -185,7 +217,7 @@ function handleButton(group, id) {
 }
 
 function stoneHatchet(){
-    alert("fuck!!!")
+    alert()
 }    
     
 function allotCitizens(item,sign) {
