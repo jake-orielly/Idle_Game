@@ -2,93 +2,218 @@
 <html>
 <body>
 <style>
-    table, td {
-        border: 1px solid black;
-    }
     td {
+        border: 1px solid black;
         padding-left: 12px;
         padding-right: 12px;
     }
+    
+    ul.tab {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+
+    /* Float the list items side by side */
+    ul.tab li {float: left;}
+
+    /* Style the links inside the list items */
+    ul.tab li a {
+        display: inline-block;
+        color: black;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        transition: 0.3s;
+        font-size: 17px;
+    }
+
+    /* Change background color of links on hover */
+    ul.tab li a:hover {
+        background-color: #ddd;
+    }
+
+    /* Create an active/current tabLink class */
+    ul.tab li a:focus, .active {
+        background-color: #ccc;
+    }
+
+    /* Style the tab content */
+    .tabContent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
+    
+    /* Popup container - can be anything you want */
+    .popup {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    /* The actual popup */
+    .popup .popuptext {
+        visibility: hidden;
+        width: 160px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px 0;
+        position: absolute;
+        z-index: 1;
+        top: 125%;
+        left: 50%;
+        margin-left: -80px;
+    }
+    /* Toggle this class - hide and show the popup */
+    .popup .show {
+        visibility: visible;
+    }
+    .popup .insufficient {
+        color: #f00;
+    }
+    
 </style>
-    
-<h1> Resources </h1>
-    
-<table>
-    <tr>
-        <td><p id="food">Food: 0</p></td>
-        <td><button type="button" class= 'button' onclick=handleButton(0,0)> Gather Food </button></td>
-    </tr>
-    <tr>
-        <td><p id="wood">Wood: 0</p></td>
-        <td><button type="button" class= 'button' onclick=handleButton(0,1)> Gather Sticks </button></td>
-        <td>0</td>
-    </tr>
-    <tr>
-        <td><p id="stone">Stone: 0</p></td>
-        <td><button type="button" class= 'button' onclick=handleButton(0,2)> Gather Stones </button></td>
-    </tr>
-</table>
-
-<h1> Citizens </h1>    
-    
-<table>
-    <tr>
-        <td>
-            Food: 0
-        </td>   
-        <td>
-            <button type="button" class= 'button' onclick=allotCitizens("food",1)>+</button>
-            <button type="button" class= 'button' onclick=allotCitizens("food",-1)>-</button>
-        </td>
-        <td>
-            0/s
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Wood: 0
-        </td>
-        <td>
-            <button type="button" class= 'button' onclick=allotCitizens("wood",1)>+</button>
-            <button type="button" class= 'button' onclick=allotCitizens("wood",-1)>-</button>
-        </td>
-        <td>
-            0/s
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Stone: 0
-        </td>
-        <td>
-            <button type="button" class= 'button' onclick=allotCitizens("stone",1)>+</button>
-            <button type="button" class= 'button' onclick=allotCitizens("stone",-1)>-</button>
-        </td>
-        <td>
-            0/s
-        </td>
-    </tr>
-</table>
-
-<p id="citizenidle">Idle: 0 </p>
-<p id="citizentotal">Total: 0 </p>
-    
-<h1> Buildings </h1>
-<table>
-    <tr>
-        <td> <p id="hut">Hut: 0</p></td>
-        <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
-    </tr>
-</table>
-    
 
 <script>
-var resourceLabels = ["food","wood","stone"];
-var resources = {food:0,wood:0,stone:0};
-var structureLabels = ["hut"];
-var structures = [0];
-var structureCost = [{wood:4,scaling:1}];
-var citizens = [0,0];
+    var resourceLabels = ["food","wood","stone"];
+    var resources = {food:0,wood:0,stone:0};
+    var structureLabels = ["hut"];
+    var structures = [0];
+    var structureCost = [{wood:4,scaling:1}];
+    var citizens = [0,0];
+    var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
+    var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet",popupText:"Wood: 5 Stone: 5 <br/> Doubles Wood Yields",resource:"wood"},stonePickaxe:{cost:{wood:10,stone:10},text:"Stone Pickaxe",popupText:"Wood: 10 Stone: 10 <br/> Doubles Stone Yields",resource:"stone"}};
+    var resourceMultiplier = {food:0,wood:0,stone:0};
+</script>    
+
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tabLinks active" onclick="openTab(event, 'Resources')">Resources</a></li>
+  <li><a href="javascript:void(0)" class="tabLinks" onclick="openTab(event, 'Upgrades')">Upgrades</a></li>
+</ul>
+
+<div id="Resources" class="tabContent">
+    <table>    
+        <tr>
+            <td><h1> Resources </h1></td>
+            <td><h1> Citizens </h1></td>
+        </tr>
+        <tr>
+            <td><script>
+                var table = "<table>";
+
+                for (var i = 0; i < resourceLabels.length; i++) {
+                    table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
+                    var button = "<button type='button' class= 'button' onclick=handleButton(0," + i + ")> Gather " + resourceLabels[i] + " </button>"
+                    table += "<td>" + button + "</td> </tr>";
+                }
+
+                table += "</table>";
+
+                document.write(table);
+            </script></td>
+            <td><script>
+                var table = "<table id='citizens'>";
+
+                for (var i = 0; i < resourceLabels.length; i++) {
+                    table += "<tr><td><div id=citizens" + resourceLabels[i] + ">" + resourceLabels[i] + ": " + citizenData[resourceLabels[i]].alloted + "</div></td>";
+                    let button1 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",1)>+</button>";
+                    let button2 = "<button type='button' class='button' onclick= allotCitizens(" + i + ",-1)>-</button>";
+                    table += "<td>" + button1 + button2 + "</td><td id=income" + resourceLabels[i] + ">" + citizenData[resourceLabels[i]].income + "/s</td>"
+                    table += "</tr>";
+                }
+
+                table += "<tr><td><div id='citizenIdle'>Idle: 0 </div></td>";
+                table += "<td><div id='citizenTotal'>Total: 0 </div></td></tr>";
+                table += "</table>";
+
+                document.write(table);
+            </script></td>
+        </tr>
+        <tr>
+            <td><h1> Buildings </h1></td>
+        </tr>
+        <tr>
+            <td><table>
+                    <td> <div id="hut">Hut: 0</div></td>
+                    <td><button type="button" class= 'button' onclick=handleButton(1,0)> Build Hut </button></td>
+            </table></td>
+        </tr>
+
+    </table>
+</div>
+
+<div id="Upgrades" class="tabContent">
+    <table>
+        <tr>
+            <td><h1> Upgrades </h1></td>
+        </tr>
+        <tr>
+            <td><script>
+                var table = "<table>";
+
+                for (var name in upgrades) {
+                    var popup = "<span class='popuptext' id='" + name + "Popup'>" + upgrades[name].popupText + "</span>"
+                    var button = "<button type='button' class= 'button popup' onclick=upgradeClicked('" + name + "') onmouseover=triggerPopup('" + name + "') onmouseout=triggerPopup('" + name + "')> Prototype " + upgrades[name].text + popup + " </button>";
+                    table += "<td id='" + name + "'>" + button + "</td> </tr>";
+                }
+
+                table += "</table>";
+
+                document.write(table);
+            </script></td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+startTab();
+setInterval(function(){refresh();},1000);
+
+function triggerPopup(item) {
+    var popup = document.getElementById(item + 'Popup');
+    popup.classList.toggle('show');
+}    
+    
+function refresh() {
+    for (var id = 0; id < resourceLabels.length; id++) {
+        var string = document.getElementById(resourceLabels[id]).innerHTML;
+        string = string.split(" ");
+        resources[resourceLabels[id]] += citizenData[resourceLabels[id]].income;
+        document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);      
+    } 
+    
+    updateLabels();
+}
+ 
+function startTab() {
+    var tabLinks = document.getElementsByClassName("tabLinks");
+    document.getElementById("Resources").style.display = "block";
+    tabLinks += " active";
+}    
+    
+function openTab(evt, tabName) {
+    var i, tabContent, tabLinks;
+    tabContent = document.getElementsByClassName("tabContent");
+    for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+    }
+    tabLinks = document.getElementsByClassName("tabLinks");
+    for (i = 0; i < tabLinks.length; i++) {
+        tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+    }
+    
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}    
+    
 function handleButton(group, id) {
     if (group == 0)
         resourceButton(id);
@@ -96,9 +221,46 @@ function handleButton(group, id) {
         buildingButton(id);
 }
 
+function upgradeClicked(item){
+    var sufficient = true;
+    
+    for(var name in upgrades[item].cost) {
+        if (upgrades[item].cost[name] > resources[name])
+            sufficient = false;
+    }
+    
+    if (sufficient){
+        for(var name in upgrades[item].cost)
+            resources[name] -= upgrades[item].cost[name];   
+        
+        resourceMultiplier[upgrades[item].resource] += 1;
+        document.getElementById(item).style="display: none;";    
+    }
+    
+    else {
+        var popup = document.getElementById(item + 'Popup');
+        popup.classList.toggle('insufficient');
+        setTimeout(function() {
+            popup.classList.toggle('insufficient');
+        }, 500);
+    }
+}
+    
+    
 function allotCitizens(item,sign) {
-    resources[item] += sign;
-    updateLabels();
+    if ((sign == 1 && citizens[0] > 0) || 
+        (sign == -1 && citizenData[resourceLabels[item]].alloted > 0)) {
+        citizenData[resourceLabels[item]].alloted += sign;
+        citizens[0] -= sign;
+        let alloted = document.getElementById("citizens" + resourceLabels[item]).innerHTML;
+        alloted = alloted.split(" ");
+        document.getElementById("citizens" + resourceLabels[item]).innerHTML = alloted[0] + " " + citizenData[resourceLabels[item]].alloted;
+        let idle = document.getElementById("citizenIdle").innerHTML;
+        idle = idle.split(" ");
+        document.getElementById("citizenIdle").innerHTML = idle[0] + " " + citizens[0];
+        citizenData[resourceLabels[item]].income += sign + resourceMultiplier[resourceLabels[item]];
+        document.getElementById("income" + resourceLabels[item]).innerHTML = citizenData[resourceLabels[item]].income + "/s";
+    }
 }
     
 function buildingButton(id) {
@@ -127,21 +289,21 @@ function buildingButton(id) {
     
 function structureBuilt(id){
     if (id == 0) {
-        let string = document.getElementById("citizenidle").innerHTML;
+        let string = document.getElementById("citizenIdle").innerHTML;
         string = string.split(" ");
         citizens[0] += 1;
-        document.getElementById("citizenidle").innerHTML = string[0] + " " + citizens[0]; 
-        string = document.getElementById("citizentotal").innerHTML;
+        document.getElementById("citizenIdle").innerHTML = string[0] + " " + citizens[0]; 
+        string = document.getElementById("citizenTotal").innerHTML;
         string = string.split(" ");
         citizens[1] += 1;
-        document.getElementById("citizentotal").innerHTML = string[0] + " " + citizens[1]; 
+        document.getElementById("citizenTotal").innerHTML = string[0] + " " + citizens[1]; 
     }
 }
 
 function resourceButton(id) {
     var string = document.getElementById(resourceLabels[id]).innerHTML;
     string = string.split(" ");
-    resources[resourceLabels[id]] += 1;
+    resources[resourceLabels[id]] += 1 + resourceMultiplier[resourceLabels[id]];
     document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);    
 }
     
