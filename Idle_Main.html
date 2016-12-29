@@ -75,6 +75,10 @@
     .popup .show {
         visibility: visible;
     }
+    .popup .insufficient {
+        color: #f00;
+    }
+    
 </style>
 
 <script>
@@ -85,7 +89,8 @@
     var structureCost = [{wood:4,scaling:1}];
     var citizens = [0,0];
     var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
-    var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet",popupText:"Doubles Wood Yields"},stonePickaxe:{text:"Stone Pickaxe",popupText:"Doubles Stone Yields"}};
+    var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet",popupText:"Wood: 5 Stone: 5 <br/> Doubles Wood Yields",resource:"wood"},stonePickaxe:{cost:{wood:10,stone:10},text:"Stone Pickaxe",popupText:"Wood: 10 Stone: 10 <br/> Doubles Stone Yields",resource:"stone"}};
+    var resourceMultiplier = {food:0,wood:0,stone:0};
 </script>    
 
 <ul class="tab">
@@ -155,8 +160,8 @@
 
                 for (var name in upgrades) {
                     var popup = "<span class='popuptext' id='" + name + "Popup'>" + upgrades[name].popupText + "</span>"
-                    var button = "<button type='button' class= 'button popup' onclick=stoneHatchet() onmouseover=triggerPopup('" + name + "') onmouseout=triggerPopup('" + name + "')> Prototype " + upgrades[name].text + popup + " </button>";
-                    table += "<td>" + button + "</td> </tr>";
+                    var button = "<button type='button' class= 'button popup' onclick=upgradeClicked('" + name + "') onmouseover=triggerPopup('" + name + "') onmouseout=triggerPopup('" + name + "')> Prototype " + upgrades[name].text + popup + " </button>";
+                    table += "<td id='" + name + "'>" + button + "</td> </tr>";
                 }
 
                 table += "</table>";
@@ -216,9 +221,31 @@ function handleButton(group, id) {
         buildingButton(id);
 }
 
-function stoneHatchet(){
-    alert()
-}    
+function upgradeClicked(item){
+    var sufficient = true;
+    
+    for(var name in upgrades[item].cost) {
+        if (upgrades[item].cost[name] > resources[name])
+            sufficient = false;
+    }
+    
+    if (sufficient){
+        for(var name in upgrades[item].cost)
+            resources[name] -= upgrades[item].cost[name];   
+        
+        resourceMultiplier[upgrades[item].resource] += 1;
+        document.getElementById(item).style="display: none;";    
+    }
+    
+    else {
+        var popup = document.getElementById(item + 'Popup');
+        popup.classList.toggle('insufficient');
+        setTimeout(function() {
+            popup.classList.toggle('insufficient');
+        }, 500);
+    }
+}
+    
     
 function allotCitizens(item,sign) {
     if ((sign == 1 && citizens[0] > 0) || 
@@ -231,7 +258,7 @@ function allotCitizens(item,sign) {
         let idle = document.getElementById("citizenIdle").innerHTML;
         idle = idle.split(" ");
         document.getElementById("citizenIdle").innerHTML = idle[0] + " " + citizens[0];
-        citizenData[resourceLabels[item]].income += sign;
+        citizenData[resourceLabels[item]].income += sign + resourceMultiplier[resourceLabels[item]];
         document.getElementById("income" + resourceLabels[item]).innerHTML = citizenData[resourceLabels[item]].income + "/s";
     }
 }
@@ -276,7 +303,7 @@ function structureBuilt(id){
 function resourceButton(id) {
     var string = document.getElementById(resourceLabels[id]).innerHTML;
     string = string.split(" ");
-    resources[resourceLabels[id]] += 1;
+    resources[resourceLabels[id]] += 1 + resourceMultiplier[resourceLabels[id]];
     document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);    
 }
     
