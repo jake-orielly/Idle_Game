@@ -8,6 +8,27 @@
         padding-right: 12px;
     }
     
+    button:focus {
+        outline:0;
+    }
+    
+    .territoryButton, .selectedTerritoryButton {
+		background-color: #4CAF50;
+		border: none;
+		color: white;
+		height: 50px;
+		width: 50px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 16px;
+		margin: 1px 1px;
+		cursor: pointer;
+        padding: 0;
+        margin: 0;
+        vertical-align: top;
+	}
+    
     ul.tab {
         list-style-type: none;
         margin: 0;
@@ -91,6 +112,24 @@
     var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
     var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet",popupText:"Wood: 5 Stone: 5 <br/> Doubles Wood Yields",resource:"wood"},stonePickaxe:{cost:{wood:10,stone:10},text:"Stone Pickaxe",popupText:"Wood: 10 Stone: 10 <br/> Doubles Stone Yields",resource:"stone"}};
     var resourceMultiplier = {food:0,wood:0,stone:0};
+    
+    var territoryImages = ["grass.png", "tree.png", "mountain.png", "village.png"];
+    var territoryValues = [];
+    for (var i = 0; i < 9; i++) {
+        territoryValues[i] = [];
+        for (var j = 0; j < 9; j++) {
+            let x = Math.random();
+            if (x < 0.12)
+                territoryValues[i][j] = 2;
+            else if (x < 0.45)
+                territoryValues[i][j] = 1;
+            else 
+                territoryValues[i][j] = 0;
+        }
+    }
+
+    territoryValues[4][4] = 3;
+    
 </script>    
 
 <ul class="tab">
@@ -175,6 +214,20 @@
 
 <div id="Territory" class="tabContent">    
     <h1>Territory</h1>
+    <script>
+        for (i = 0; i < 9; i++) {
+            document.write("<div>");
+
+            for (j = 0; j < 9; j ++)
+                document.write(generateButton(i,j));
+
+            document.write("</div>");
+        }
+        
+        function generateButton(x,y) {
+            return "<button type='button' class= 'territoryButton' onclick=handleTerritory(" + x + "," + y + ")> <img src=art/"+ territoryImages[territoryValues[x][y]] + " width='50' height='50' id=territory" + x + "," + y + "/> </button>";
+        }
+    </script>
 </div>
     
 <script>
@@ -182,6 +235,10 @@
 startTab();
 setInterval(function(){refresh();},1000);
 
+function handleTerritory(x,y) {
+    alert("" + x + "," + y);
+} 
+    
 function triggerPopup(item) {
     var popup = document.getElementById(item + 'Popup');
     popup.classList.toggle('show');
