@@ -48,7 +48,6 @@
         text-align: center;
         padding: 14px 16px;
         text-decoration: none;
-        transition: 0.3s;
         font-size: 17px;
     }
 
@@ -100,6 +99,10 @@
         color: #f00;
     }
     
+    .territoryText {
+        float: right;
+    }
+    
 </style>
 
 <script>
@@ -128,7 +131,7 @@
         }
     }
 
-    territoryValues[4][4] = 3;
+    territoryValues[4][4] = 0;
     
 </script>    
 
@@ -213,7 +216,17 @@
 </div>
 
 <div id="Territory" class="tabContent">    
-    <h1>Territory</h1>
+    <table style="float:right">
+        <tr>
+            <td><h1>Territories</h1></td>
+        </tr>
+        <tr>
+            <td style="font-size:24px" id='territoryAvailible'>Availible: 0</td>
+        </tr>
+        <tr>
+            <td style="font-size:24px" id='territoryOccupied'>Occupied: 0</td>
+        </tr>
+    </table>
     <script>
         for (i = 0; i < 9; i++) {
             document.write("<div>");
@@ -225,7 +238,7 @@
         }
         
         function generateButton(x,y) {
-            return "<button type='button' class= 'territoryButton' onclick=handleTerritory(" + x + "," + y + ")> <img src=art/"+ territoryImages[territoryValues[x][y]] + " width='50' height='50' id=territory" + x + "," + y + "/> </button>";
+            return "<button type='button' class= 'territoryButton' onclick=handleTerritory(" + x + "," + y + ")> <img src=art/"+ territoryImages[territoryValues[x][y]] + " width='50' height='50' id='territory" + x + "," + y + "'/> </button>";
         }
     </script>
 </div>
@@ -233,8 +246,23 @@
 <script>
 
 startTab();
+initializeTerritoryOccupied();
 setInterval(function(){refresh();},1000);
 
+    
+function initializeTerritoryOccupied() {
+    var result = 0;
+    
+    for (var i = 0; i < territoryValues.length; i++) {
+        for (var j = 0; j < territoryValues[i].length; j++) {
+            if (territoryValues[i][j] == 0)
+                result += 1;
+        }
+    }
+    
+    document.getElementById("territoryAvailible").innerHTML = "Availible: " + result;
+}
+    
 function handleTerritory(x,y) {
     alert("" + x + "," + y);
 } 
@@ -334,7 +362,9 @@ function buildingButton(id) {
             sufficient = false; 
     }
     
-    if (sufficient) {
+    var enoughSpace = buildStructure();
+    
+    if (sufficient && enoughSpace) {
         var string = document.getElementById(structureLabels[id]).innerHTML;
         string = string.split(" ");
         structures[id] += 1;
@@ -348,6 +378,32 @@ function buildingButton(id) {
         updateLabels();
     }
 }
+
+function buildStructure() {
+    let currentX = 4;
+    let currentY = 4;
+    let current = 300;
+    let newVal = 0;
+    for (var i = 0; i < territoryValues.length; i++) {
+        for (var j = 0; j < territoryValues[i].length; j++) {
+            if (territoryValues[i][j] == 0){
+                newVal = Math.abs(4-j) + Math.abs(4-i);
+                if (newVal < current) {
+                    current = newVal;
+                    currentX = j;
+                    currentY = i;
+                }
+            }
+        }
+    }
+    
+    if (current != 300) {
+        territoryValues[currentY][currentX] = 3;
+        document.getElementById("territory" + currentY + "," + currentX ).src = "art/" + territoryImages[3];
+    }
+    
+    return current != 300;
+}    
     
 function structureBuilt(id){
     if (id == 0) {
