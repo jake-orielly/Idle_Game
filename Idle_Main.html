@@ -280,6 +280,13 @@ function refresh() {
         document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);      
     } 
     
+    if (resources.food > 0)
+        resources.food -= citizens[1]*0.2;
+    
+    else {
+        alert("kill citizen");
+    }
+    
     updateLabels();
 }
  
@@ -429,7 +436,7 @@ function updateLabels() {
     for(var id in resources) {
         let string = document.getElementById(id).innerHTML;
         string = string.split(" ");
-        document.getElementById(id).innerHTML = string[0] + " " + (resources[id]); 
+        document.getElementById(id).innerHTML = string[0] + " " + (parseInt(resources[id])); 
     }
 }
 
