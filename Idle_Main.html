@@ -244,11 +244,18 @@
 </div>
     
 <script>
-
+    
 startTab();
 initializeTerritoryOccupied();
 setInterval(function(){refresh();},1000);
-
+    
+function roundDecimal(given,places){
+    var result = given * Math.pow(10,places);
+    Math.round(result);
+    result = result / Math.pow(10,places);
+    result = result.toFixed(places);
+    return result;
+}    
     
 function initializeTerritoryOccupied() {
     var result = 0;
@@ -356,7 +363,7 @@ function allotCitizens(item,sign) {
         idle = idle.split(" ");
         document.getElementById("citizenIdle").innerHTML = idle[0] + " " + citizens[0];
         citizenData[resourceLabels[item]].income += sign + resourceMultiplier[resourceLabels[item]];
-        document.getElementById("income" + resourceLabels[item]).innerHTML = citizenData[resourceLabels[item]].income + "/s";
+        document.getElementById("income" + resourceLabels[item]).innerHTML = roundDecimal(citizenData[resourceLabels[item]].income,1) + "/s";
     }
 }
     
@@ -382,7 +389,7 @@ function buildingButton(id) {
         }
         
         citizenData.food.income -= 0.2;
-        document.getElementById("incomefood").innerHTML = citizenData.food.income + "/s";
+        document.getElementById("incomefood").innerHTML = roundDecimal(citizenData.food.income,1) + "/s";
 
         
         structureBuilt(id);
