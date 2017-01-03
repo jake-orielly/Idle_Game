@@ -280,7 +280,7 @@ function refresh() {
         document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);      
     } 
     
-    if (resources.food > 0)
+    if (resources.food >= 0)
         resources.food -= citizens[1]*0.2;
     
     else {
@@ -380,6 +380,10 @@ function buildingButton(id) {
         for(var name in structureCost[id]) {
             resources[name] -= 4; 
         }
+        
+        citizenData.food.income -= 0.2;
+        document.getElementById("incomefood").innerHTML = citizenData.food.income + "/s";
+
         
         structureBuilt(id);
         updateLabels();
