@@ -221,10 +221,10 @@
             <td><h1>Territories</h1></td>
         </tr>
         <tr>
-            <td style="font-size:24px" id='territoryAvailible'>Availible: 0</td>
+            <td style="font-size:24px" id='territoryPrimary'>Primary: 0</td>
         </tr>
         <tr>
-            <td style="font-size:24px" id='territoryOccupied'>Occupied: 0</td>
+            <td style="font-size:24px" id='territorySecondary'>Secondary: 0</td>
         </tr>
     </table>
     <script>
@@ -271,7 +271,9 @@ function initializeTerritoryOccupied() {
 }
     
 function handleTerritory(x,y) {
-    alert("" + x + "," + y);
+    var string = document.getElementById("territoryPrimary").innerHTML;
+    string = string.split(" ");
+    document.getElementById("territoryPrimary").innerHTML = string[0] + " "+ territoryValues[x][y];
 } 
     
 function triggerPopup(item) {
