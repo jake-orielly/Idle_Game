@@ -221,10 +221,10 @@
             <td><h1>Territories</h1></td>
         </tr>
         <tr>
-            <td style="font-size:24px" id='territoryAvailible'>Availible: 0</td>
+            <td style="font-size:24px" id='territoryPrimary'>Primary: 0</td>
         </tr>
         <tr>
-            <td style="font-size:24px" id='territoryOccupied'>Occupied: 0</td>
+            <td style="font-size:24px" id='territorySecondary'>Secondary: 0</td>
         </tr>
     </table>
     <script>
@@ -244,11 +244,18 @@
 </div>
     
 <script>
-
+    
 startTab();
 initializeTerritoryOccupied();
 setInterval(function(){refresh();},1000);
-
+    
+function roundDecimal(given,places){
+    var result = given * Math.pow(10,places);
+    Math.round(result);
+    result = result / Math.pow(10,places);
+    result = result.toFixed(places);
+    return result;
+}    
     
 function initializeTerritoryOccupied() {
     var result = 0;
@@ -264,7 +271,9 @@ function initializeTerritoryOccupied() {
 }
     
 function handleTerritory(x,y) {
-    alert("" + x + "," + y);
+    var string = document.getElementById("territoryPrimary").innerHTML;
+    string = string.split(" ");
+    document.getElementById("territoryPrimary").innerHTML = string[0] + " "+ territoryValues[x][y];
 } 
     
 function triggerPopup(item) {
@@ -280,12 +289,19 @@ function refresh() {
         document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);      
     } 
     
+    if (resources.food >= 0)
+        resources.food -= citizens[1]*0.2;
+    
+    else {
+        alert("kill citizen");
+    }
+    
     updateLabels();
 }
  
 function startTab() {
     var tabLinks = document.getElementsByClassName("tabLinks");
-    document.getElementById("Resources").style.display = "block";
+    document.getElementById("Territory").style.display = "block";
     tabLinks += " active";
 }    
     
@@ -349,7 +365,7 @@ function allotCitizens(item,sign) {
         idle = idle.split(" ");
         document.getElementById("citizenIdle").innerHTML = idle[0] + " " + citizens[0];
         citizenData[resourceLabels[item]].income += sign + resourceMultiplier[resourceLabels[item]];
-        document.getElementById("income" + resourceLabels[item]).innerHTML = citizenData[resourceLabels[item]].income + "/s";
+        document.getElementById("income" + resourceLabels[item]).innerHTML = roundDecimal(citizenData[resourceLabels[item]].income,1) + "/s";
     }
 }
     
@@ -373,6 +389,10 @@ function buildingButton(id) {
         for(var name in structureCost[id]) {
             resources[name] -= 4; 
         }
+        
+        citizenData.food.income -= 0.2;
+        document.getElementById("incomefood").innerHTML = roundDecimal(citizenData.food.income,1) + "/s";
+
         
         structureBuilt(id);
         updateLabels();
@@ -429,7 +449,7 @@ function updateLabels() {
     for(var id in resources) {
         let string = document.getElementById(id).innerHTML;
         string = string.split(" ");
-        document.getElementById(id).innerHTML = string[0] + " " + (resources[id]); 
+        document.getElementById(id).innerHTML = string[0] + " " + (parseInt(resources[id])); 
     }
 }
 
