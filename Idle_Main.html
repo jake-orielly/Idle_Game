@@ -123,8 +123,26 @@
     var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet",popupText:"Wood: 5 Stone: 5 <br/> Doubles Wood Yields",resource:"wood"},stonePickaxe:{cost:{wood:10,stone:10},text:"Stone Pickaxe",popupText:"Wood: 10 Stone: 10 <br/> Doubles Stone Yields",resource:"stone"}};
     var resourceMultiplier = {food:0,wood:0,stone:0};
     
+    var grasslandBuildings = ["Field","Village"];
+    var forrestBuildings = ["cavalry"];
+    var mountainBuildings = ["soldier"];
+    var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
+    
     var territoryImages = ["grass.png", "tree.png", "mountain.png", "village.png"];
     var territoryValues = [];
+    
+    Element.prototype.remove = function() {
+        this.parentElement.removeChild(this);
+    }
+    NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+        for(var i = this.length - 1; i >= 0; i--) {
+            if(this[i] && this[i].parentElement) {
+                this[i].parentElement.removeChild(this[i]);
+            }
+        }
+    }
+    
+    
     for (var i = 0; i < 9; i++) {
         territoryValues[i] = [];
         for (var j = 0; j < 9; j++) {
@@ -233,9 +251,22 @@
         <tr>
             <td style="font-size:24px" id='territorySecondary'>Secondary: 0</td>
         </tr>
-        <tr>
-            <td><img src='art/village.png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500'>Build Hut</button></td>
-        </tr>
+            <script>
+                generateBuildingButtons(0);
+                
+                function generateBuildingButtons(terrainTile) {
+                    document.getElementsByClassName("territoryBuildButton").remove();
+                    
+                    var button;
+                    var buildings = terrainBuildings[terrainTile];
+                    for (var i = 0; i < buildings.length; i++) {
+                        button = "<tr class='territoryBuildButton' id='territoryBuildingButton'" + i + "><td>";
+                        button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500'>Build " + buildings[i] + "</button>";
+                        button += "</td></tr>";
+                        document.write(button);   
+                    }
+                }
+            </script>
     </table>
     <script>
         for (i = 0; i < 9; i++) {
