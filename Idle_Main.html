@@ -8,6 +8,10 @@
         padding-right: 12px;
     }
     
+    .tdBlank {
+        border: 0;
+    }
+    
     button:focus {
         outline:0;
     }
@@ -251,22 +255,23 @@
         <tr>
             <td style="font-size:24px" id='territorySecondary'>Secondary: 0</td>
         </tr>
+        <td class='tdBlank' id="xxx">
             <script>
                 generateBuildingButtons(0);
                 
                 function generateBuildingButtons(terrainTile) {
-                    document.getElementsByClassName("territoryBuildButton").remove();
-                    
-                    var button;
+                    var button = "<table>";
                     var buildings = terrainBuildings[terrainTile];
                     for (var i = 0; i < buildings.length; i++) {
-                        button = "<tr class='territoryBuildButton' id='territoryBuildingButton'" + i + "><td>";
+                        button += "<tr class='territoryBuildButton' id='territoryBuildingButton'" + i + "><td>";
                         button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500'>Build " + buildings[i] + "</button>";
-                        button += "</td></tr>";
-                        document.write(button);   
+                        button += "</td></tr>";  
                     }
+                    button += "</table>";
+                    document.getElementById('xxx').innerHTML = button;
                 }
             </script>
+        </td>
     </table>
     <script>
         for (i = 0; i < 9; i++) {
@@ -315,6 +320,7 @@ function handleTerritory(x,y) {
     var string = document.getElementById("territoryPrimary").innerHTML;
     string = string.split(" ");
     document.getElementById("territoryPrimary").innerHTML = string[0] + " "+ territoryValues[x][y];
+    generateBuildingButtons(territoryValues[x][y]);
 } 
     
 function triggerPopup(item) {
