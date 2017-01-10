@@ -128,12 +128,15 @@
     var resourceMultiplier = {food:0,wood:0,stone:0};
     
     var grasslandBuildings = ["Field","Village"];
-    var forrestBuildings = ["cavalry"];
-    var mountainBuildings = ["soldier"];
+    var forrestBuildings = ["Lumber_Mill"];
+    var mountainBuildings = ["Mine"];
     var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
     
     var territoryImages = ["grass.png", "tree.png", "mountain.png", "village.png"];
     var territoryValues = [];
+    
+    var selectedX;
+    var selectedY;
     
     Element.prototype.remove = function() {
         this.parentElement.removeChild(this);
@@ -255,20 +258,21 @@
         <tr>
             <td style="font-size:24px" id='territorySecondary'>Secondary: 0</td>
         </tr>
-        <td class='tdBlank' id="xxx">
+        <td class='tdBlank' id="territoryStructureButtons">
             <script>
                 generateBuildingButtons(0);
                 
                 function generateBuildingButtons(terrainTile) {
                     var button = "<table>";
                     var buildings = terrainBuildings[terrainTile];
+                    
                     for (var i = 0; i < buildings.length; i++) {
                         button += "<tr class='territoryBuildButton' id='territoryBuildingButton'" + i + "><td>";
-                        button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500'>Build " + buildings[i] + "</button>";
+                        button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=buildingButton('" + buildings[i] + "')>Build " + buildings[i].replace("_"," ") + "</button>";
                         button += "</td></tr>";  
                     }
                     button += "</table>";
-                    document.getElementById('xxx').innerHTML = button;
+                    document.getElementById('territoryStructureButtons').innerHTML = button;
                 }
             </script>
         </td>
@@ -317,6 +321,9 @@ function initializeTerritoryOccupied() {
 }
     
 function handleTerritory(x,y) {
+    selectedX = x;
+    selectedY = y;
+    
     var string = document.getElementById("territoryPrimary").innerHTML;
     string = string.split(" ");
     document.getElementById("territoryPrimary").innerHTML = string[0] + " "+ territoryValues[x][y];
@@ -418,60 +425,17 @@ function allotCitizens(item,sign) {
     
 function buildingButton(id) {
     var sufficient = true;
-    
-    for(var name in structureCost[id]) {
+    /*for(var name in structureCost[id]) {
         var value = structureCost[id][name];
         if (name != "scaling" && structureCost[id][name] > resources[name])
             sufficient = false; 
+    }*/
+    if (sufficient) {
+        document.getElementById("territory" + selectedX + "," + selectedY).src="art/" + id + ".png";
     }
+}  
     
-    var enoughSpace = buildStructure();
-    
-    if (sufficient && enoughSpace) {
-        var string = document.getElementById(structureLabels[id]).innerHTML;
-        string = string.split(" ");
-        structures[id] += 1;
-        document.getElementById(structureLabels[id]).innerHTML = string[0] + " " + (structures[id]);
-        
-        for(var name in structureCost[id]) {
-            resources[name] -= 4; 
-        }
-        
-        citizenData.food.income -= 0.2;
-        document.getElementById("incomefood").innerHTML = roundDecimal(citizenData.food.income,1) + "/s";
-
-        
-        structureBuilt(id);
-        updateLabels();
-    }
-}
-
-function buildStructure() {
-    let currentX = 4;
-    let currentY = 4;
-    let current = 300;
-    let newVal = 0;
-    for (var i = 0; i < territoryValues.length; i++) {
-        for (var j = 0; j < territoryValues[i].length; j++) {
-            if (territoryValues[i][j] == 0){
-                newVal = Math.abs(4-j) + Math.abs(4-i);
-                if (newVal < current) {
-                    current = newVal;
-                    currentX = j;
-                    currentY = i;
-                }
-            }
-        }
-    }
-    
-    if (current != 300) {
-        territoryValues[currentY][currentX] = 3;
-        document.getElementById("territory" + currentY + "," + currentX ).src = "art/" + territoryImages[3];
-    }
-    
-    return current != 300;
-}    
-    
+//UPDATE THIS    
 function structureBuilt(id){
     if (id == 0) {
         let string = document.getElementById("citizenIdle").innerHTML;
