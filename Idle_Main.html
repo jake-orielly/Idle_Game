@@ -123,7 +123,7 @@
     var structures = [0];
     var structureCost = [{wood:4,scaling:1}];
     var citizens = [0,0];
-    var citizenData = {food:{alloted:0,income:0},wood:{alloted:0,income:0},stone:{alloted:0,income:0}};
+    var citizenData = {food:{alloted:0,income:1},wood:{alloted:0,income:1},stone:{alloted:0,income:1}};
     var upgrades = {stoneHatchet:{cost:{wood:5,stone:5},text:"Stone Hatchet",popupText:"Wood: 5 Stone: 5 <br/> Doubles Wood Yields",resource:"wood"},stonePickaxe:{cost:{wood:10,stone:10},text:"Stone Pickaxe",popupText:"Wood: 10 Stone: 10 <br/> Doubles Stone Yields",resource:"stone"}};
     var resourceMultiplier = {food:0,wood:0,stone:0};
     
@@ -247,7 +247,7 @@
     </table>
 </div>
 
-<div id="Territory" class="tabContent">    
+<div id="Territory" class="tabContent">
     <table style="float:right">
         <tr>
             <td><h1>Territories</h1></td>
@@ -276,6 +276,24 @@
                 }
             </script>
         </td>
+    </table>
+    <table style="float:right">
+        <tr>
+            <td><h1> Resources </h1></td>
+        </tr>
+        <tr>
+            <td><script>
+                var table = "<table>";
+
+                for (var i = 0; i < resourceLabels.length; i++) {
+                    table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
+                }
+
+                table += "</table>";
+
+                document.write(table);
+            </script></td>
+        </tr>
     </table>
     <script>
         for (i = 0; i < 9; i++) {
