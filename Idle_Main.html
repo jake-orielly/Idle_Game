@@ -126,6 +126,7 @@
     var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
     var buildingResourceMap = {Field:"Food",Lumber_Mill:"Wood",Mine:"Stone"};
     var buildingCosts = {Village:{Wood:10},Field:{Food:5},Lumber_Mill:{Wood:5},Mine:{Wood:10}};
+    var buildingGrid = [];
     
     var territoryImages = ["grass.png", "tree.png", "mountain.png"];
     var territoryValues = [];
@@ -135,6 +136,7 @@
     
     for (var i = 0; i < 9; i++) {
         territoryValues[i] = [];
+        buildingGrid[i] = [];
         for (var j = 0; j < 9; j++) {
             let x = Math.random();
             if (x < 0.12)
@@ -143,6 +145,7 @@
                 territoryValues[i][j] = 1;
             else 
                 territoryValues[i][j] = 0;
+            buildingGrid[i][j] = -1;
         }
     }
 
@@ -176,15 +179,22 @@
                 
                 function generateBuildingButtons(terrainTile) {
                     var button = "<table>";
-                    var buildings = terrainBuildings[terrainTile];
                     
-                    for (var i = 0; i < buildings.length; i++) {
-                        button += "<tr class='territoryBuildButton' id='territoryBuildingButton'" + i + "><td>";
-                        button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=buildingButton('" + buildings[i] + "')>Build " + buildings[i].replace("_"," ") + "</button>";
-                        button += "</td></tr>";  
+                    if (buildingGrid[selectedX][selectedY] == -1) {
+                        var buildings = terrainBuildings[terrainTile];
+                    
+                        for (var i = 0; i < buildings.length; i++) {
+                            button += "<tr class='territoryBuildButton' id='territoryBuildingButton'" + i + "><td>";
+                            button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=buildingButton('" + buildings[i] + "')>Build " + buildings[i].replace("_"," ") + "</button>";
+                            button += "</td></tr>";  
+                        }
+                        button += "</table>";
+                        document.getElementById('territoryBuildingButtons').innerHTML = button;   
                     }
-                    button += "</table>";
-                    document.getElementById('territoryBuildingButtons').innerHTML = button;
+                    else {
+                        button += "</table>";
+                        document.getElementById('territoryBuildingButtons').innerHTML = button;  
+                    }
                 }
             </script>
         </td>
@@ -305,12 +315,19 @@ function buildingButton(id) {
             resources[name].current -= buildingCosts[id][name];
             document.getElementById(name + "amount").innerHTML = name + ": " + roundDecimal(resources[name].current,1);
         }
+        
+        buildingGrid[selectedX][selectedY] = grasslandBuildings.indexOf(id);
+        var clear = "<table></table>";
+        document.getElementById('territoryBuildingButtons').innerHTML = clear; 
     }
+    
     else {
         alert("Too Poor!");
     }
 }  
 
+    
+    
 </script>
     
 </body>
