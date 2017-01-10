@@ -124,7 +124,8 @@
     var forrestBuildings = ["Lumber_Mill"];
     var mountainBuildings = ["Mine"];
     var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
-    var structureResourceMap = {Field:"Food",Lumber_Mill:"Wood",Mine:"Stone"};
+    var buildingResourceMap = {Field:"Food",Lumber_Mill:"Wood",Mine:"Stone"};
+    var buildingCosts = {Village:{Wood:10},Field:{Food:5},Lumber_Mill:{Wood:5},Mine:{Wood:10}};
     
     var territoryImages = ["grass.png", "tree.png", "mountain.png", "village.png"];
     var territoryValues = [];
@@ -169,7 +170,7 @@
         <tr>
             <td style="font-size:24px" id='territorySecondary'>Secondary: 0</td>
         </tr>
-        <td class='tdBlank' id="territoryStructureButtons">
+        <td class='tdBlank' id="territoryBuildingButtons">
             <script>
                 generateBuildingButtons(0);
                 
@@ -183,7 +184,7 @@
                         button += "</td></tr>";  
                     }
                     button += "</table>";
-                    document.getElementById('territoryStructureButtons').innerHTML = button;
+                    document.getElementById('territoryBuildingButtons').innerHTML = button;
                 }
             </script>
         </td>
@@ -286,15 +287,27 @@ function openTab(evt, tabName) {
   
 function buildingButton(id) {
     var sufficient = true;
-    /*for(var name in structureCost[id]) {
-        var value = structureCost[id][name];
-        if (name != "scaling" && structureCost[id][name] > resources[name])
-            sufficient = false; 
-    }*/
+    
+    for(var name in buildingCosts[id]) {
+        var value = buildingCosts[id][name];
+        if (name != "scaling" && buildingCosts[id][name] > resources[name].current) {
+            sufficient = false;
+        }
+    }
+    
     if (sufficient) {
         document.getElementById("territory" + selectedX + "," + selectedY).src="art/" + id + ".png";
-        resources[structureResourceMap[id]].income += 0.1;
-        document.getElementById(structureResourceMap[id] + "income").innerHTML = structureResourceMap[id] + ": " + roundDecimal(resources[structureResourceMap[id]].income,1);
+        resources[buildingResourceMap[id]].income += 0.1;
+        document.getElementById(buildingResourceMap[id] + "income").innerHTML = buildingResourceMap[id] + ": " + roundDecimal(resources[buildingResourceMap[id]].income,1);
+        
+        for(var name in buildingCosts[id]) {
+            var value = buildingCosts[id][name];
+            resources[name].current -= buildingCosts[id][name];
+            document.getElementById(name + "amount").innerHTML = name + ": " + roundDecimal(resources[name].current,1);
+        }
+    }
+    else {
+        alert("Too Poor!");
     }
 }  
 
