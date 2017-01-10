@@ -118,7 +118,7 @@
 
 <script>
     var resourceLabels = ["food","wood","stone"];
-    var resources = {food:0,wood:0,stone:0};
+    var resources = {food:{current:0,income:1},wood:{current:0,income:0.1},stone:{current:0,income:0}};
     var structureLabels = ["hut"];
     var structures = [0];
     var structureCost = [{wood:4,scaling:1}];
@@ -137,18 +137,6 @@
     
     var selectedX;
     var selectedY;
-    
-    Element.prototype.remove = function() {
-        this.parentElement.removeChild(this);
-    }
-    NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-        for(var i = this.length - 1; i >= 0; i--) {
-            if(this[i] && this[i].parentElement) {
-                this[i].parentElement.removeChild(this[i]);
-            }
-        }
-    }
-    
     
     for (var i = 0; i < 9; i++) {
         territoryValues[i] = [];
@@ -286,7 +274,7 @@
                 var table = "<table>";
 
                 for (var i = 0; i < resourceLabels.length; i++) {
-                    table += "<tr><td><div id=" + resourceLabels[i] + ">" + resourceLabels[i] + ": 0</div></td>";
+                    table += "<tr><td><div id=" + resourceLabels[i] + "amount>" + resourceLabels[i] + ": " + resources[resourceLabels[i]].current + "</div></td>";
                 }
 
                 table += "</table>";
@@ -312,9 +300,7 @@
 </div>
     
 <script>
-    
 startTab();
-initializeTerritoryOccupied();
 setInterval(function(){refresh();},1000);
     
 function roundDecimal(given,places){
@@ -322,21 +308,12 @@ function roundDecimal(given,places){
     Math.round(result);
     result = result / Math.pow(10,places);
     result = result.toFixed(places);
+    
+    if (result == parseInt(result)) //This means 4.0 comes out as 4
+        result = parseInt(result);
+    
     return result;
 }    
-    
-function initializeTerritoryOccupied() {
-    var result = 0;
-    
-    for (var i = 0; i < territoryValues.length; i++) {
-        for (var j = 0; j < territoryValues[i].length; j++) {
-            if (territoryValues[i][j] == 0)
-                result += 1;
-        }
-    }
-    
-    document.getElementById("territoryAvailible").innerHTML = "Availible: " + result;
-}
     
 function handleTerritory(x,y) {
     selectedX = x;
@@ -354,18 +331,9 @@ function triggerPopup(item) {
 }    
     
 function refresh() {
-    for (var id = 0; id < resourceLabels.length; id++) {
-        var string = document.getElementById(resourceLabels[id]).innerHTML;
-        string = string.split(" ");
-        resources[resourceLabels[id]] += citizenData[resourceLabels[id]].income;
-        document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);      
-    } 
-    
-    if (resources.food >= 0)
-        resources.food -= citizens[1]*0.2;
-    
-    else {
-        alert("kill citizen");
+    for (var i = 0; i < resourceLabels.length; i++) {
+        resources[resourceLabels[i]].current += resources[resourceLabels[i]].income;
+        document.getElementById(resourceLabels[i] + "amount").innerHTML = resourceLabels[i] + ": " + roundDecimal(resources[resourceLabels[i]].current,1);
     }
     
     updateLabels();
@@ -472,14 +440,6 @@ function resourceButton(id) {
     string = string.split(" ");
     resources[resourceLabels[id]] += 1 + resourceMultiplier[resourceLabels[id]];
     document.getElementById(resourceLabels[id]).innerHTML = string[0] + " " + (resources[resourceLabels[id]]);    
-}
-    
-function updateLabels() {
-    for(var id in resources) {
-        let string = document.getElementById(id).innerHTML;
-        string = string.split(" ");
-        document.getElementById(id).innerHTML = string[0] + " " + (parseInt(resources[id])); 
-    }
 }
 
 </script>
