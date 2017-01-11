@@ -118,7 +118,7 @@
 
 <script>
     var resourceLabels = ["Food","Wood","Stone"];
-    var resources = {Food:{current:0,income:1},Wood:{current:0,income:0.1},Stone:{current:0,income:0}};
+    var resources = {Food:{current:0,income:1},Wood:{current:15,income:0.1},Stone:{current:0,income:0}};
     
     var grasslandBuildings = ["Farm","Village"];
     var forrestBuildings = ["Lumber_Mill"];
@@ -277,7 +277,6 @@ function refresh() {
     updateLabels();
 }
 
-//NOTE: DOES NOT WORK WITH LUMBER MILL OR MINE, INCOME STAYS THE SAME
 function deleteBuilding() {
     document.getElementById("territory" + selectedX + "," + selectedY).src="art/" + territoryImages[territoryValues[selectedX][selectedY]];
     var currentResource = buildingResourceMap[terrainBuildings[territoryValues[selectedX][selectedY]][buildingGrid[selectedX][selectedY]]]; //returns the resource produced by the building on that tile . . . yes it is ugly as all hell
@@ -330,7 +329,7 @@ function buildingButton(id) {
             document.getElementById(name + "amount").innerHTML = name + ": " + roundDecimal(resources[name].current,1);
         }
         
-        buildingGrid[selectedX][selectedY] = grasslandBuildings.indexOf(id);
+        buildingGrid[selectedX][selectedY] = terrainBuildings[territoryValues[selectedX][selectedY]].indexOf(id);
         var clear = "<table>";
         clear += "<tr><td>";
         clear += "<img src='art/delete.png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=deleteBuilding()>Delete</button>";
