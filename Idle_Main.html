@@ -120,12 +120,12 @@
     var resourceLabels = ["Food","Wood","Stone"];
     var resources = {Food:{current:0,income:1},Wood:{current:0,income:0.1},Stone:{current:0,income:0}};
     
-    var grasslandBuildings = ["Field","Village"];
+    var grasslandBuildings = ["Farm","Village"];
     var forrestBuildings = ["Lumber_Mill"];
     var mountainBuildings = ["Mine"];
     var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
-    var buildingResourceMap = {Field:"Food",Lumber_Mill:"Wood",Mine:"Stone"};
-    var buildingCosts = {Village:{Wood:10},Field:{Food:5},Lumber_Mill:{Wood:5},Mine:{Wood:10}};
+    var buildingResourceMap = {Farm:"Food",Lumber_Mill:"Wood",Mine:"Stone"};
+    var buildingCosts = {Village:{Wood:10},Farm:{Food:5},Lumber_Mill:{Wood:5},Mine:{Wood:10}};
     var buildingGrid = [];
     
     var territoryImages = ["grass.png", "tree.png", "mountain.png"];
@@ -192,6 +192,9 @@
                         document.getElementById('territoryBuildingButtons').innerHTML = button;   
                     }
                     else {
+                        button += "<tr><td>";
+                        button += "<img src='art/delete.png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=deleteBuilding()>Delete</button>";
+                        button += "</td></tr>";  
                         button += "</table>";
                         document.getElementById('territoryBuildingButtons').innerHTML = button;  
                     }
@@ -273,7 +276,18 @@ function refresh() {
     
     updateLabels();
 }
- 
+
+//NOTE: DOES NOT WORK WITH LUMBER MILL OR MINE, INCOME STAYS THE SAME
+function deleteBuilding() {
+    document.getElementById("territory" + selectedX + "," + selectedY).src="art/" + territoryImages[territoryValues[selectedX][selectedY]];
+    var currentResource = buildingResourceMap[terrainBuildings[territoryValues[selectedX][selectedY]][buildingGrid[selectedX][selectedY]]]; //returns the resource produced by the building on that tile . . . yes it is ugly as all hell
+    resources[currentResource].income -= 0.1;
+    document.getElementById(currentResource + "income").innerHTML =  roundDecimal(resources[currentResource].income,1) + "/s";
+    buildingGrid[selectedX][selectedY] = -1;
+    
+    generateBuildingButtons(territoryValues[selectedX][selectedY]);
+}    
+    
 function startTab() {
     var tabLinks = document.getElementsByClassName("tabLinks");
     document.getElementById("Territory").style.display = "block";
@@ -317,7 +331,11 @@ function buildingButton(id) {
         }
         
         buildingGrid[selectedX][selectedY] = grasslandBuildings.indexOf(id);
-        var clear = "<table></table>";
+        var clear = "<table>";
+        clear += "<tr><td>";
+        clear += "<img src='art/delete.png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=deleteBuilding()>Delete</button>";
+        clear += "</td></tr>";  
+        clear += "</table>";
         document.getElementById('territoryBuildingButtons').innerHTML = clear; 
     }
     
