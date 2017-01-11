@@ -117,15 +117,15 @@
 </style>
 
 <script>
-    var resourceLabels = ["Food","Wood","Stone"];
-    var resources = {Food:{current:0,income:1},Wood:{current:20,income:0.1},Stone:{current:10,income:0}};
+    var resourceLabels = ["Food","Wood","Furs","Stone"];
+    var resources = {Food:{current:0,income:1},Wood:{current:20,income:0.1},Furs:{current:0,income:0},Stone:{current:10,income:0}};
     
     var grasslandBuildings = ["Farm","Village","Barracks"];
-    var forrestBuildings = ["Lumber_Mill"];
+    var forrestBuildings = ["Lumber_Mill","Hunter_Camp"];
     var mountainBuildings = ["Mine"];
     var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
-    var buildingResourceMap = {Farm:"Food",Lumber_Mill:"Wood",Mine:"Stone"};
-    var buildingCosts = {Farm:{Food:5},Village:{Wood:10},Barracks:{Wood:20,Stone:10},Lumber_Mill:{Wood:5},Mine:{Wood:10}};
+    var buildingResourceMap = {Farm:"Food",Lumber_Mill:"Wood",Hunter_Camp:"Furs",Mine:"Stone"};
+    var buildingCosts = {Farm:{Food:5},Village:{Wood:10},Barracks:{Wood:20,Stone:10},Lumber_Mill:{Wood:5},Mine:{Wood:10},Hunter_Camp:{Wood:15}};
     var buildingGrid = [];
     
     var territoryImages = ["grass.png", "tree.png", "mountain.png"];
