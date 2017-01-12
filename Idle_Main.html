@@ -17,8 +17,8 @@
     }
     
     .PLACEHOLDER {
-        height:50px;
-        width:50px;
+        height:64px;
+        width:64px;
         float: left;
         margin: 10px;
     }
@@ -125,7 +125,8 @@
     var mountainBuildings = ["Mine"];
     var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
     var buildingResourceMap = {Farm:"Food",Lumber_Mill:"Wood",Hunter_Camp:"Furs",Mine:"Stone"};
-    var buildingCosts = {Farm:{Food:5},Village:{Wood:10},Barracks:{Wood:20,Stone:10},Lumber_Mill:{Wood:5},Mine:{Wood:10},Hunter_Camp:{Wood:15}};
+    var buildingStats = {Farm:{cost:{Food:5},income:{Food:0.1},count:0},Village:{cost:{Wood:10},count:0},Barracks:{cost:{Wood:20,Stone:10},count:0},Lumber_Mill:{cost:{Wood:5},income:{Wood:0.1},count:0},Mine:{cost:{Wood:10},income:{Stone:0.1},count:0},Hunter_Camp:{cost:{Wood:15},income:{Furs:0.1,Food:0.5},count:0}};
+    
     var buildingGrid = [];
     
     var territoryImages = ["grass.png", "tree.png", "mountain.png"];
@@ -279,9 +280,12 @@ function refresh() {
 
 function deleteBuilding() {
     document.getElementById("territory" + selectedX + "," + selectedY).src="art/" + territoryImages[territoryValues[selectedX][selectedY]];
-    var currentResource = buildingResourceMap[terrainBuildings[territoryValues[selectedX][selectedY]][buildingGrid[selectedX][selectedY]]]; //returns the resource produced by the building on that tile . . . yes it is ugly as all hell
-    resources[currentResource].income -= 0.1;
-    document.getElementById(currentResource + "income").innerHTML =  roundDecimal(resources[currentResource].income,1) + "/s";
+    
+    var buildingHere = terrainBuildings[territoryValues[selectedX][selectedY]][buildingGrid[selectedX][selectedY]]; //returns the the building on that tile . . . yes it is ugly as all hell
+
+    buildingStats[buildingHere].count -= 1;
+    calcIncomes();
+    
     buildingGrid[selectedX][selectedY] = -1;
     
     generateBuildingButtons(territoryValues[selectedX][selectedY]);
@@ -311,23 +315,19 @@ function openTab(evt, tabName) {
 function buildingButton(id) {
     var sufficient = true;
     
-    for(var name in buildingCosts[id]) {
-        var value = buildingCosts[id][name];
-        if (name != "scaling" && buildingCosts[id][name] > resources[name].current) {
+    for(var name in buildingStats[id].cost) {
+        var value = buildingStats[id].cost[name];
+        if (name != "scaling" && buildingStats[id].cost[name] > resources[name].current) {
             sufficient = false;
         }
     }
     
     if (sufficient) {
         document.getElementById("territory" + selectedX + "," + selectedY).src="art/" + id + ".png";
-        if (buildingResourceMap[id]) {
-            resources[buildingResourceMap[id]].income += 0.1;
-            document.getElementById(buildingResourceMap[id] + "income").innerHTML = roundDecimal(resources[buildingResourceMap[id]].income,1) + "/s";
-        }
         
-        for(var name in buildingCosts[id]) {
-            var value = buildingCosts[id][name];
-            resources[name].current -= buildingCosts[id][name];
+        for(var name in buildingStats[id].cost) {
+            var value = buildingStats[id].cost[name];
+            resources[name].current -= buildingStats[id].cost[name];
             document.getElementById(name + "amount").innerHTML = name + ": " + roundDecimal(resources[name].current,1);
         }
         
@@ -337,7 +337,10 @@ function buildingButton(id) {
         clear += "<img src='art/delete.png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=deleteBuilding()>Delete</button>";
         clear += "</td></tr>";  
         clear += "</table>";
-        document.getElementById('territoryBuildingButtons').innerHTML = clear; 
+        document.getElementById('territoryBuildingButtons').innerHTML = clear;
+        
+        buildingStats[id].count += 1;
+        calcIncomes();
     }
     
     else {
@@ -345,7 +348,31 @@ function buildingButton(id) {
     }
 }  
 
+function calcIncomes() {
+    for (var item in resources)
+        resources[item].income = 0;
     
+    jankIncomes();
+    
+    for(var name in buildingStats) {
+        var value = buildingStats[name];
+        
+        if (buildingStats[name].income) {
+            for (var item in buildingStats[name].income) {
+                resources[item].income += buildingStats[name].income[item] * buildingStats[name].count;
+            }
+        }
+    }
+    
+    for (var item in resources)
+        document.getElementById(item + "income").innerHTML = roundDecimal(resources[item].income,1) + "/s";
+}
+   
+//This will be moved in later versions, just sets income to start values used for testing    
+function jankIncomes() {
+    resources.Food.income = 1;
+    resources.Wood.income = 0.1;
+}
     
 </script>
     
