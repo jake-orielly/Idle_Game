@@ -114,9 +114,26 @@
         float: right;
     }
     
+    .unitPortrait {
+        width: 64px;
+        height: 64px;
+    }
+    
+    .unitTd {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .unitText {
+        font-size: 32px;
+        text-align: center;
+    }
+    
 </style>
 
 <script>
+    var territoryImages = ["grass.png", "tree.png", "mountain.png"];
+    
     var resourceLabels = ["Food","Wood","Furs","Stone"];
     var resources = {Food:{current:0,income:1},Wood:{current:20,income:0.1},Furs:{current:0,income:0},Stone:{current:10,income:0}};
     
@@ -124,17 +141,26 @@
     var forrestBuildings = ["Lumber_Mill","Hunter_Camp"];
     var mountainBuildings = ["Mine"];
     var terrainBuildings = [grasslandBuildings, forrestBuildings, mountainBuildings];
+    
+    var Farm = {cost:{Food:5},income:{Food:0.1},count:0};
+    var Village = {cost:{Wood:10},count:0};
+    var Barracks = {cost:{Wood:20,Stone:10},count:0};
+    var Lumber_Mill = {cost:{Wood:5},income:{Wood:0.1},count:0};
+    var Hunter_Camp = {cost:{Wood:15},income:{Furs:0.1,Food:0.5},count:0};
+    var Mine = {cost:{Wood:10},income:{Stone:0.1},count:0};
+    
     var buildingResourceMap = {Farm:"Food",Lumber_Mill:"Wood",Hunter_Camp:"Furs",Mine:"Stone"};
-    var buildingStats = {Farm:{cost:{Food:5},income:{Food:0.1},count:0},Village:{cost:{Wood:10},count:0},Barracks:{cost:{Wood:20,Stone:10},count:0},Lumber_Mill:{cost:{Wood:5},income:{Wood:0.1},count:0},Mine:{cost:{Wood:10},income:{Stone:0.1},count:0},Hunter_Camp:{cost:{Wood:15},income:{Furs:0.1,Food:0.5},count:0}};
+    var buildingStats = {Farm,Village,Barracks,Lumber_Mill,Mine,Hunter_Camp};
+    
+    var Spearman = {name:"Spearman",strength:2,cost:{Wood:5,Stone:2,Furs:3},count:0}
+    var units = {Spearman};
     
     var buildingGrid = [];
-    
-    var territoryImages = ["grass.png", "tree.png", "mountain.png"];
-    var territoryValues = [];
     
     var selectedX = 4;
     var selectedY = 4;
     
+    var territoryValues = [];
     for (var i = 0; i < 9; i++) {
         territoryValues[i] = [];
         buildingGrid[i] = [];
@@ -161,6 +187,20 @@
 
 <div id="Military" class="tabContent">
     <h1>Military</h1>
+    <table>
+        <script>
+            for (var name in units) {
+                var currentUnit = "<tr>";
+                var tdClass = "class='unitTd'";
+                currentUnit += "<td " + tdClass + "><div class='unitText' id=" + name + "Count>" + units[name].count + "</div></td>";
+                currentUnit += "<td " + tdClass + "><img src='art/" + name + ".png' class='unitPortrait'/></td>"
+                currentUnit += "<td " + tdClass + "><div class='unitText'>" + units[name].strength + "</div></td>";
+                currentUnit += "<td><button type='button' class='PLACEHOLDER' onclick=buildUnit(" + name + ")><div style='font-size:20px'>Build</div></button></td>"
+                currentUnit += "</tr>";
+                document.write(currentUnit);
+            }
+        </script>
+    </table>
 </div>
 
 <div id="Territory" class="tabContent">
@@ -186,7 +226,7 @@
                     
                         for (var i = 0; i < buildings.length; i++) {
                             button += "<tr class='territoryBuildButton' id='territoryBuildingButton'" + i + "><td>";
-                            button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=buildingButton('" + buildings[i] + "')>Build " + buildings[i].replace("_"," ") + "</button>";
+                            button += "<img src='art/" + buildings[i] + ".png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' onclick=buildingButton('" + buildings[i] + "')>Build " + buildings[i].replace("_"," ") + "</button>";
                             button += "</td></tr>";  
                         }
                         button += "</table>";
@@ -194,7 +234,7 @@
                     }
                     else {
                         button += "<tr><td>";
-                        button += "<img src='art/delete.png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' width='500' onclick=deleteBuilding()>Delete</button>";
+                        button += "<img src='art/delete.png' class='PLACEHOLDER'/><button type='button' class='PLACEHOLDER' onclick= deleteBuilding()>Delete</button>";
                         button += "</td></tr>";  
                         button += "</table>";
                         document.getElementById('territoryBuildingButtons').innerHTML = button;  
@@ -293,7 +333,7 @@ function deleteBuilding() {
     
 function startTab() {
     var tabLinks = document.getElementsByClassName("tabLinks");
-    document.getElementById("Territory").style.display = "block";
+    document.getElementById("Military").style.display = "block";
     tabLinks += " active";
 }    
     
@@ -348,6 +388,11 @@ function buildingButton(id) {
     }
 }  
 
+function buildUnit (given) {
+    given.count += 1;
+    document.getElementById(given.name + "Count").innerHTML = given.count;
+}    
+    
 function calcIncomes() {
     for (var item in resources)
         resources[item].income = 0;
